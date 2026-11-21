@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -53,18 +53,18 @@ footer{text-align:center;color:#e0d3bc;margin-top:16px;font-size:.85rem}
 <div class="hero" aria-hidden="true"><span class="plane">✈︎</span></div>
 <div class="content">
 <h1 id="title" lang="en" tabindex="-1">Airport Adventure</h1>
-<p>От интервью до посадки. Практикуй английский в 20 миссиях или выбери свой уровень.</p>
+<p>Practise cabin crew English from interview to arrival. Play all 20 missions or choose your level.</p>
 <div class="levels" id="levels"></div>
 </div>
 </section>
 <section id="play" class="content" aria-labelledby="place" hidden>
 <p class="meta" id="mission"></p>
-<progress id="progress" class="track" aria-label="Миссии пройдены"></progress>
+<progress id="progress" class="track" aria-label="Missions completed"></progress>
 <h2 id="place" lang="en" tabindex="-1"></h2>
 <div class="scene"><span id="avatar" class="avatar" aria-hidden="true"></span><div>
 <strong id="character"></strong><p id="question" lang="en"></p>
 </div></div>
-<div class="controls"><button id="listen">🔊 Слушать задание</button></div>
+<div class="controls"><button id="listen">🔊 Listen to the prompt</button></div>
 <p id="audioStatus" role="status"></p>
 <div id="choices" class="choices" lang="en"></div>
 <div id="feedback" class="feedback" hidden>
@@ -72,41 +72,41 @@ footer{text-align:center;color:#e0d3bc;margin-top:16px;font-size:.85rem}
 </div>
 <div class="controls">
 <button id="next" class="primary" hidden></button>
-<button id="listenAnswer" hidden>🔊 Слушать ответ</button>
-<button id="back">К выбору уровня</button>
+<button id="listenAnswer" hidden>🔊 Listen to the answer</button>
+<button id="back">Choose a level</button>
 </div>
 </section>
 <section id="result" class="content" aria-labelledby="resultTitle" hidden>
-<h2 id="resultTitle" tabindex="-1">Маршрут завершён</h2>
+<h2 id="resultTitle" tabindex="-1">Route complete</h2>
 <p id="finalScore" class="summary"></p>
 <p id="message"></p>
 <div class="controls">
-<button id="again" class="primary">Пройти ещё раз</button>
-<button id="copy">Скопировать для тренера</button>
-<button id="menu">К выбору уровня</button>
+<button id="again" class="primary">Play again</button>
+<button id="copy">Copy for your trainer</button>
+<button id="menu">Choose a level</button>
 </div>
 <p id="shareStatus" role="status"></p>
-<textarea id="shareText" aria-label="Результат для тренера" readonly hidden></textarea>
+<textarea id="shareText" aria-label="Results for your trainer" readonly hidden></textarea>
 </section>
 </div>
 <footer>GURU · Practice English. Fly higher.</footer>
 </main>
 <script>
 const characters = [
-  ['👩🏽‍💼', 'София · рекрутер'],
-  ['🧑🏻‍💼', 'Алекс · агент аэропорта'],
-  ['👩🏼‍✈️', 'Майя · бортпроводница'],
-  ['🧑🏾‍✈️', 'Даниэль · бортпроводник']
+  ['👩🏽‍💼', 'Sofia · Recruiter'],
+  ['🧑🏻‍💼', 'Alex · Airport agent'],
+  ['👩🏼‍✈️', 'Maya · Flight attendant'],
+  ['🧑🏾‍✈️', 'Daniel · Flight attendant']
 ];
-const missions = [["A1","0","Crew introduction","Please introduce yourself.","My name is Anna. I'm from Russia.","My name Anna. I from Russia.","I have Anna. I'm Russia.","My name is… и I'm from… — имя и страна."],["A1","1","Check-in","Where is Gate 12?","Go straight and turn left.","Turn left after Gate 12.","Your seat is 12A.","Go straight — идите прямо. Turn left — поверните налево."],["A1","2","Boarding","A passenger steps onto the plane. Greet them.","Good morning! Welcome on board.","Goodbye! Have a nice day.","Good night! See you tomorrow.","Welcome on board! — Добро пожаловать на борт!"],["A1","2","Find the seat","Excuse me, I can't find my seat.","May I see your boarding pass?","May I take your drink?","May I close the door?","May I see…? — Можно посмотреть…?"],["A1","3","Drink service","Offer a passenger some water.","Would you like some water?","Do you have any water?","Could I have some water?","Would you like…? — вежливое предложение."],["A1","3","Tea or coffee","Could I have some tea, please?","Of course. With milk or lemon?","Of course. Window or aisle?","Of course. What is your seat number?","With milk or lemon? — С молоком или лимоном?"],["A2","0","Interview","How do you help nervous passengers?","I listen first and explain what to expect.","I expect them to explain the flight to me.","I wait for them to stop asking questions.","What to expect — чего ожидать."],["A2","1","Bag drop","Can I take this suitcase on board? It’s over the cabin baggage limit.","I'm afraid it needs to be checked in.","You can keep it under your seat.","I'll tag it as cabin baggage.","Check in a bag — сдать багаж."],["A2","1","Gate change","Is my flight still leaving from Gate 12? It’s now at Gate 18.","The gate has changed to Gate 18.","Your seat has changed to 18A.","Boarding starts in eighteen minutes.","The gate has changed — выход на посадку изменился."],["A2","2","Seat location","My boarding pass says 14C. Is that by the window? 14C is on the aisle.","It's an aisle seat in row 14.","It's a window seat in row 14.","It's the middle seat in row 14.","Aisle seat — место у прохода. Row — ряд."],["A2","2","Hand luggage","Can I leave my bag here in the aisle?","Could you put it under the seat in front of you?","Could you leave it beside your feet in the aisle?","Could you put it right by the exit?","The seat in front of you — кресло перед вами."],["A2","3","Meal service","We’re out of chicken. Offer the other available meal.","I'm afraid we're out of chicken. Would you like fish instead?","The chicken is ready. Would you like to wait?","We’re out of fish. Would you like chicken instead?","We’re out of… — у нас закончилось… Instead — вместо этого."],["A2","3","Extra blanket","I'm feeling cold. Do you have a spare blanket?","Let me check if we have one available.","Let me check what time we land.","Let me see if your meal is ready.","A spare blanket — запасной плед."],["B1","0","Interview follow-up","Tell me about a time you handled a complaint.","A guest was upset about a delay, so I gave them an update and offered a place to wait.","I usually arrive early and make sure my uniform looks neat.","I would probably ask someone else to speak to the guest.","Для вопроса Tell me about a time… приведи конкретный пример из прошлого."],["B1","1","Tight connection","My flight is delayed. Can you guarantee I’ll make my connection?","I can't guarantee that, but I can check your connection and available options.","Yes, I'm sure the next flight will wait for you.","You'll have to book a new ticket before we check anything.","I can check your options — могу уточнить, какие у вас есть варианты."],["B1","1","Boarding announcement","Good afternoon. We are now boarding groups one and two. All other groups, please remain seated.","Only groups one and two should approach the gate now.","Groups one and two should remain seated.","All passengers can board now.","Remain seated — оставайтесь на своих местах."],["B1","2","Seat mix-up","Someone is in my seat, but they say their boarding pass has the same number.","Let me check both boarding passes so we can sort this out.","Ask them to move immediately. Your seat is definitely the correct one.","Please take any empty seat and stay there for the flight.","Sort this out — разобраться с ситуацией."],["B1","3","Food allergies","I have a nut allergy. Can you confirm this dessert is safe for me?","Let me check the ingredient information. I can't confirm until I've checked.","It looks fine. I don't see any nuts.","It should be safe if you only have a small bite.","I can't confirm until I've checked — смогу подтвердить после проверки."],["B1","3","Service complaint","I've been waiting for my drink for twenty minutes.","I understand that's frustrating. I'll check on your order now.","You'll just have to wait. Everyone else is waiting too.","You must have forgotten to order it.","I understand that's frustrating — понимаю, как это неприятно."],["B1","2","Arrival","The seat belt sign is still on. A passenger asks if they can get their bag.","Please remain seated until the sign is switched off.","You can get your bag now if you're quick.","You can stand up as soon as we touch down.","Until the sign is switched off — пока табло не погаснет."]].map(
+const missions = [["A1","0","Crew introduction","Please introduce yourself.","My name is Anna. I'm from Russia.","My name Anna. I from Russia.","I have Anna. I'm Russia.","Use “My name is…” to introduce yourself and “I’m from…” to say where you come from."],["A1","1","Check-in","Where is Gate 12?","Go straight and turn left.","Turn left after Gate 12.","Your seat is 12A.","“Go straight” means keep going in the same direction. “Turn left” tells the passenger which way to go next."],["A1","2","Boarding","A passenger steps onto the plane. Greet them.","Good morning! Welcome on board.","Goodbye! Have a nice day.","Good night! See you tomorrow.","Say “Welcome on board!” when someone enters the aircraft."],["A1","2","Find the seat","Excuse me, I can't find my seat.","May I see your boarding pass?","May I take your drink?","May I close the door?","“May I see…?” is a polite way to ask someone to show you something."],["A1","3","Drink service","Offer a passenger some water.","Would you like some water?","Do you have any water?","Could I have some water?","“Would you like…?” is a polite way to offer something."],["A1","3","Tea or coffee","Could I have some tea, please?","Of course. With milk or lemon?","Of course. Window or aisle?","Of course. What is your seat number?","Ask “With milk or lemon?” to find out how the passenger takes their tea."],["A2","0","Interview","How do you help nervous passengers?","I listen first and explain what to expect.","I expect them to explain the flight to me.","I wait for them to stop asking questions.","“What to expect” means what is likely to happen next."],["A2","1","Bag drop","Can I take this suitcase on board? It’s over the cabin baggage limit.","I'm afraid it needs to be checked in.","You can keep it under your seat.","I'll tag it as cabin baggage.","To “check in a bag” is to hand it over so it can travel in the aircraft hold."],["A2","1","Gate change","Is my flight still leaving from Gate 12? It’s now at Gate 18.","The gate has changed to Gate 18.","Your seat has changed to 18A.","Boarding starts in eighteen minutes.","Use “The gate has changed to…” to tell passengers the new gate number."],["A2","2","Seat location","My boarding pass says 14C. Is that by the window? 14C is on the aisle.","It's an aisle seat in row 14.","It's a window seat in row 14.","It's the middle seat in row 14.","An “aisle seat” is next to the walkway. A “row” is a line of seats."],["A2","2","Hand luggage","Can I leave my bag here in the aisle?","Could you put it under the seat in front of you?","Could you leave it beside your feet in the aisle?","Could you put it right by the exit?","“The seat in front of you” is the seat directly ahead of yours."],["A2","3","Meal service","We’re out of chicken. Offer the other available meal.","I'm afraid we're out of chicken. Would you like fish instead?","The chicken is ready. Would you like to wait?","We’re out of fish. Would you like chicken instead?","“We’re out of…” means there is none left. “Instead” introduces an alternative."],["A2","3","Extra blanket","I'm feeling cold. Do you have a spare blanket?","Let me check if we have one available.","Let me check what time we land.","Let me see if your meal is ready.","A “spare blanket” is an extra blanket you can offer if one is available."],["B1","0","Interview follow-up","Tell me about a time you handled a complaint.","A guest was upset about a delay, so I gave them an update and offered a place to wait.","I usually arrive early and make sure my uniform looks neat.","I would probably ask someone else to speak to the guest.","“Tell me about a time…” asks for a specific example from the past. Explain what happened and what you did."],["B1","1","Tight connection","My flight is delayed. Can you guarantee I’ll make my connection?","I can't guarantee that, but I can check your connection and available options.","Yes, I'm sure the next flight will wait for you.","You'll have to book a new ticket before we check anything.","“I can check your options” offers help without promising the passenger will make the connection."],["B1","1","Boarding announcement","Good afternoon. We are now boarding groups one and two. All other groups, please remain seated.","Only groups one and two should approach the gate now.","Groups one and two should remain seated.","All passengers can board now.","“Remain seated” means stay in your seat."],["B1","2","Seat mix-up","Someone is in my seat, but they say their boarding pass has the same number.","Let me check both boarding passes so we can sort this out.","Ask them to move immediately. Your seat is definitely the correct one.","Please take any empty seat and stay there for the flight.","“Sort this out” means find a solution to the problem."],["B1","3","Food allergies","I have a nut allergy. Can you confirm this dessert is safe for me?","Let me check the ingredient information. I can't confirm until I've checked.","It looks fine. I don't see any nuts.","It should be safe if you only have a small bite.","“I can’t confirm until I’ve checked” makes it clear you need to verify the information first."],["B1","3","Service complaint","I've been waiting for my drink for twenty minutes.","I understand that's frustrating. I'll check on your order now.","You'll just have to wait. Everyone else is waiting too.","You must have forgotten to order it.","“I understand that’s frustrating” acknowledges how the passenger feels before you offer to help."],["B1","2","Arrival","The seat belt sign is still on. A passenger asks if they can get their bag.","Please remain seated until the sign is switched off.","You can get your bag now if you're quick.","You can stand up as soon as we touch down.","“Until the sign is switched off” means wait until the light goes out."]].map(
   ([level, character, title, prompt, correct, distractorOne, distractorTwo, tip]) =>
     ({level, character: Number(character), title, prompt, correct, distractors: [distractorOne, distractorTwo], tip})
 );
 const modes = {
-  all: 'Весь маршрут',
-  A1: 'A1 · Первые фразы',
-  A2: 'A2 · Ситуации в аэропорту и на борту',
-  B1: 'B1 · Вопросы пассажиров и интервью'
+  all: 'Full route',
+  A1: 'A1 · First phrases',
+  A2: 'A2 · At the airport and on board',
+  B1: 'B1 · Passenger requests and interviews'
 };
 const storageKey = 'guru-airport-results-v2';
 const pointsPerAnswer = 20;
@@ -138,8 +138,8 @@ function renderHome(moveFocus = true) {
     const button = document.createElement('button');
     const strong = document.createElement('strong');
     strong.textContent = label;
-    const details = number + (number < 5 ? ' миссии' : ' миссий');
-    button.append(strong, details + (previous ? ' · Последний результат ' + previous.correct + '/' + previous.total : ''));
+    const details = number + ' missions';
+    button.append(strong, details + (previous ? ' · Last score ' + previous.correct + '/' + previous.total : ''));
     button.addEventListener('click', () => start(id));
     el('levels').append(button);
   }
@@ -160,7 +160,7 @@ function renderMission() {
   answered = false;
   const mission = route[step];
   const [avatar, character] = characters[mission.character];
-  el('mission').textContent = mission.level + ' · Миссия ' + (step + 1) + ' из ' + route.length;
+  el('mission').textContent = mission.level + ' · Mission ' + (step + 1) + ' of ' + route.length;
   el('progress').max = route.length;
   el('progress').value = step;
   el('place').textContent = mission.title;
@@ -195,11 +195,11 @@ function select(selected, mission) {
   }
   el('score').textContent = (correctCount * pointsPerAnswer) + ' XP';
   el('progress').value = step + 1;
-  el('verdict').textContent = correct ? 'Верно! +' + pointsPerAnswer + ' XP' : 'Правильный ответ';
+  el('verdict').textContent = correct ? 'Correct! +' + pointsPerAnswer + ' XP' : 'Correct answer';
   el('correction').textContent = mission.correct;
   el('tip').textContent = mission.tip;
   el('feedback').hidden = false;
-  el('next').textContent = step + 1 === route.length ? 'Посмотреть результат →' : 'Следующая миссия →';
+  el('next').textContent = step + 1 === route.length ? 'See results →' : 'Next mission →';
   el('next').hidden = false;
   el('listenAnswer').hidden = el('listen').hidden;
   el('feedback').tabIndex = -1;
@@ -218,13 +218,13 @@ function finish() {
   }
   show('result');
   el('finalScore').textContent = correctCount + ' / ' + total + ' · ' + xp + ' XP';
-  let badge = 'Первый полёт';
-  if (correctCount === total) badge = 'Готов к взлёту';
-  else if (correctCount / total >= 0.7) badge = 'Уверенный курс';
-  el('message').textContent = 'Значок «' + badge + '». ' +
-    (saved ? 'Результат сохранён в этом браузере.' : 'Результат можно скопировать и отправить тренеру.');
+  let badge = 'First Flight';
+  if (correctCount === total) badge = 'Ready for Takeoff';
+  else if (correctCount / total >= 0.7) badge = 'On Course';
+  el('message').textContent = 'Badge earned: ' + badge + '. ' +
+    (saved ? 'Your score was saved in this browser.' : 'You can copy your results and send them to your trainer.');
   resultText = ['GURU × Chicken or Fish · Airport Adventure', modes[mode],
-    'Правильных ответов: ' + correctCount + ' из ' + total, 'XP: ' + xp, 'Значок: ' + badge].join('\n');
+    'Correct answers: ' + correctCount + ' of ' + total, 'XP: ' + xp, 'Badge: ' + badge].join('\n');
   el('shareStatus').textContent = '';
   el('shareText').hidden = true;
   el('resultTitle').focus();
@@ -244,7 +244,7 @@ function speak(text) {
   utterance.rate = 0.88;
   utterance.onerror = event => {
     if (event.error !== 'interrupted' && event.error !== 'canceled') {
-      el('audioStatus').textContent = 'Озвучка сейчас недоступна в этом браузере.';
+      el('audioStatus').textContent = 'Audio is currently unavailable in this browser.';
     }
   };
   speech.speak(utterance);
@@ -265,14 +265,14 @@ el('menu').addEventListener('click', () => renderHome());
 el('copy').addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(resultText);
-    el('shareStatus').textContent = 'Скопировано. Вставь результат в сообщение тренеру.';
+    el('shareStatus').textContent = 'Copied. Paste your results into a message to your trainer.';
   } catch {
     const field = el('shareText');
     field.value = resultText;
     field.hidden = false;
     field.focus();
     field.select();
-    el('shareStatus').textContent = 'Скопируй выделенный текст и отправь тренеру.';
+    el('shareStatus').textContent = 'Copy the selected text and send it to your trainer.';
   }
 });
 renderHome(false);
