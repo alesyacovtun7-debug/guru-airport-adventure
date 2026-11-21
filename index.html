@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GURU | Airport Adventure</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1426;color:#fff;
+font-family:Arial,sans-serif;min-height:100vh;
+display:grid;place-items:center;padding:20px}
+.game{width:min(100%,560px);background:#14213b;
+border:1px solid #33435f;border-radius:24px;
+padding:26px;box-shadow:0 20px 60px #0005}
+header{display:flex;justify-content:space-between;
+align-items:center;color:#f4cc83;font-weight:bold}
+.progress{display:flex;gap:6px;margin:24px 0}
+.progress span{height:6px;flex:1;background:#35435d;
+border-radius:10px}
+.progress .active{background:#f4cc83}
+small{color:#f4cc83;letter-spacing:2px}
+h1{font-size:30px;margin:10px 0 22px}
+.scene{background:#203352;border-radius:18px;
+padding:26px;text-align:center;margin-bottom:20px}
+.emoji{font-size:58px;margin-bottom:14px}
+.question{font-size:20px;line-height:1.5}
+.choice{display:block;width:100%;padding:17px;
+margin:10px 0;text-align:left;background:#203352;
+color:white;border:1px solid #455674;
+border-radius:12px;cursor:pointer;font-size:16px}
+.choice:hover:not(:disabled){border-color:#f4cc83}
+.choice.correct{background:#17443c;
+border-color:#4bd5a8}
+.choice.wrong{background:#552d3a;
+border-color:#ff8995}
+.choice:disabled{cursor:default}
+.feedback{background:#263957;border-radius:12px;
+padding:16px;line-height:1.6;margin:18px 0}
+.next{width:100%;padding:17px;border:0;
+border-radius:12px;background:#f4cc83;
+color:#17233b;font-size:17px;font-weight:bold;
+cursor:pointer;margin-top:14px}
+.hidden{display:none}
+.result{text-align:center;padding:30px 0}
+.result .score{font-size:56px;color:#f4cc83}
+footer{text-align:center;color:#8e9db6;
+font-size:12px;margin-top:24px}
+</style>
+</head>
+<body>
+<main class="game">
+<header>
+<div>✈ GURU ENGLISH GAMES</div>
+<div id="score">⭐ 0 XP</div>
+</header>
+<div id="progress" class="progress"></div>
+<section id="play">
+<small id="mission"></small>
+<h1 id="place"></h1>
+<div class="scene">
+<div id="emoji" class="emoji"></div>
+<div id="question" class="question"></div>
+</div>
+<div id="choices"></div>
+<div id="feedback" class="feedback hidden"
+aria-live="polite"></div>
+<button id="next" class="next hidden"
+onclick="nextMission()">Next mission →</button>
+</section>
+<section id="result" class="result hidden">
+<div style="font-size:64px">🏆</div>
+<h1>Mission Complete!</h1>
+<div id="finalScore" class="score"></div>
+<p id="message"></p>
+<button class="next" onclick="restart()">
+Play again ↻
+</button>
+</section>
+<footer>GURU • Practice English. Fly higher.</footer>
+</main>
+<script>
+const missions=[
+{
+name:"01 / CREW INTRODUCTION",
+place:"Crew briefing room",emoji:"👩‍✈️",
+q:"The recruiter says: Please introduce yourself.",
+a:[
+"My name is Anna. I am from Russia.",
+"I name Anna. I from Russia.",
+"Me Anna from Russia."
+],
+correct:0,
+tip:"Use My name is... and I am from..."
+},
+{
+name:"02 / CHECK-IN",
+place:"Airport check-in desk",emoji:"🧳",
+q:"A passenger asks: Where is Gate 12?",
+a:[
+"It is a passport.",
+"I am gate twelve.",
+"Go straight and turn left."
+],
+correct:2,
+tip:"Go straight = идите прямо. Turn left = налево."
+},
+{
+name:"03 / BOARDING",
+place:"Aircraft entrance",emoji:"✈️",
+q:"A passenger comes on board. What do you say?",
+a:[
+"Goodbye!",
+"Welcome on board!",
+"Good night yesterday!"
+],
+correct:1,
+tip:"Welcome on board! = Добро пожаловать на борт!"
+},
+{
+name:"04 / CABIN SERVICE",
+place:"Passenger cabin",emoji:"💺",
+q:"A passenger says: I can't find my seat.",
+a:[
+"May I see your boarding pass?",
+"I want a coffee.",
+"I am a window."
+],
+correct:0,
+tip:"May I see...? is a polite request."
+},
+{
+name:"05 / DRINK SERVICE",
+place:"In-flight service",emoji:"🥤",
+q:"You want to offer water to a passenger.",
+a:[
+"You water now.",
+"Water is fly.",
+"Would you like some water?"
+],
+correct:2,
+tip:"Would you like...? is a polite offer."
+}
+];
+
+let step=0,points=0,answered=false;
+const el=id=>document.getElementById(id);
+
+function render(){
+answered=false;
+const m=missions[step];
+el("mission").textContent=m.name;
+el("place").textContent=m.place;
+el("emoji").textContent=m.emoji;
+el("question").textContent=m.q;
+el("score").textContent="⭐ "+points+" XP";
+el("feedback").classList.add("hidden");
+el("next").classList.add("hidden");
+el("choices").innerHTML="";
+el("progress").innerHTML="";
+
+missions.forEach((_,i)=>{
+const bar=document.createElement("span");
+if(i<=step)bar.className="active";
+el("progress").appendChild(bar);
+});
+
+m.a.forEach((answer,i)=>{
+const btn=document.createElement("button");
+btn.className="choice";
+btn.textContent=String.fromCharCode(65+i)+". "+answer;
+btn.onclick=()=>select(i);
+el("choices").appendChild(btn);
+});
+}
+
+function select(i){
+if(answered)return;
+answered=true;
+const m=missions[step];
+const correct=i===m.correct;
+if(correct)points+=20;
+el("score").textContent="⭐ "+points+" XP";
+
+[...el("choices").children].forEach((btn,j)=>{
+btn.disabled=true;
+if(j===m.correct)btn.classList.add("correct");
+else if(j===i)btn.classList.add("wrong");
+});
+
+el("feedback").textContent=
+(correct?"Excellent! +20 XP. ":"Not quite! +0 XP. ")
++m.tip;
+el("feedback").classList.remove("hidden");
+el("next").textContent=
+step===missions.length-1?
+"See my results →":"Next mission →";
+el("next").classList.remove("hidden");
+}
+
+function nextMission(){
+step++;
+if(step<missions.length){render();return;}
+el("play").classList.add("hidden");
+el("progress").classList.add("hidden");
+el("result").classList.remove("hidden");
+el("finalScore").textContent=points+" / 100 XP";
+el("message").textContent=points===100?
+"Outstanding! You're ready for your next mission.":
+points>=60?
+"Great work! Keep practising your cabin crew English.":
+"Good start! Review the phrases and try again.";
+}
+
+function restart(){
+step=0;points=0;
+el("result").classList.add("hidden");
+el("play").classList.remove("hidden");
+el("progress").classList.remove("hidden");
+render();
+}
+render();
+</script>
+</body>
+</html>
