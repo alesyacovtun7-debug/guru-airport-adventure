@@ -112,6 +112,10 @@ const storageKey = 'guru-airport-results-v2';
 const pointsPerAnswer = 20;
 const el = id => document.getElementById(id);
 const speech = window.speechSynthesis;
+const AudioOutput = window.AudioContext || window.webkitAudioContext;
+const speechAssets = 'https://cdn.jsdelivr.net/gh/foxdog-studios/meSpeak@db5aaedb4df07e7f66329b4567f7f8abadc3a28b/';
+let audioContext, voiceEngine, audioSource, audioRequest = 0;
+const speechBuffers = new Map();
 let lastResults = readResults();
 let mode, route, step, correctCount, answered, resultText;
 
@@ -169,7 +173,7 @@ function renderMission() {
   el('question').textContent = mission.prompt;
   el('score').textContent = (correctCount * pointsPerAnswer) + ' XP';
   el('audioStatus').textContent = '';
-  el('listen').hidden = !speech || !window.SpeechSynthesisUtterance;
+  el('listen').hidden = false;
   el('feedback').hidden = el('next').hidden = el('listenAnswer').hidden = true;
   el('choices').replaceChildren();
   const answers = [...mission.distractors];
@@ -231,23 +235,112 @@ function finish() {
 }
 
 function stopAudio() {
+  audioRequest++;
+  if (audioSource) {
+    audioSource.stop();
+    audioSource.disconnect();
+    audioSource = null;
+  }
   if (speech) speech.cancel();
 }
 
-function speak(text) {
-  stopAudio();
-  el('audioStatus').textContent = '';
+function loadVoiceEngine() {
+  if (!voiceEngine) {
+    const script = document.createElement('script');
+    script.src = speechAssets + 'mespeak.js';
+    const engineLoaded = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        script.remove();
+        reject(new Error('Voice engine timed out'));
+      }, 8000);
+      script.onload = () => {
+        clearTimeout(timer);
+        resolve(window.meSpeak);
+      };
+      script.onerror = () => {
+        clearTimeout(timer);
+        reject(new Error('Voice engine unavailable'));
+      };
+      document.head.append(script);
+    });
+    const readJSON = async path => {
+      const response = await fetch(speechAssets + path, {signal: AbortSignal.timeout(8000)});
+      if (!response.ok) throw new Error('Voice data unavailable');
+      return response.json();
+    };
+    voiceEngine = Promise.all([
+      engineLoaded, readJSON('mespeak_config.json'), readJSON('voices/en/en-us.json')
+    ]).then(([engine, config, voice]) => {
+      engine.loadConfig(config);
+      engine.loadVoice(voice);
+      return engine;
+    }).catch(error => {
+      voiceEngine = null;
+      throw error;
+    });
+  }
+  return voiceEngine;
+}
+
+function playBrowserVoice(text, request) {
+  const status = el('audioStatus');
+  if (!speech || !window.SpeechSynthesisUtterance) {
+    status.textContent = 'Audio could not play. Try opening the game in your regular browser.';
+    return;
+  }
   const utterance = new SpeechSynthesisUtterance(text);
-  const english = speech.getVoices().find(voice => voice.lang.toLowerCase().startsWith('en'));
-  utterance.lang = english ? english.lang : 'en-GB';
+  const english = speech.getVoices().find(voice => /^en(?:-|$)/i.test(voice.lang));
+  utterance.lang = english ? english.lang : 'en-US';
   if (english) utterance.voice = english;
   utterance.rate = 0.88;
-  utterance.onerror = event => {
-    if (event.error !== 'interrupted' && event.error !== 'canceled') {
-      el('audioStatus').textContent = 'Audio is currently unavailable in this browser.';
+  const timer = setTimeout(() => {
+    if (request === audioRequest) {
+      stopAudio();
+      status.textContent = 'Audio could not play. Try opening the game in your regular browser.';
     }
+  }, 3500);
+  utterance.onstart = () => {
+    clearTimeout(timer);
+    if (request === audioRequest) status.textContent = '';
+  };
+  utterance.onerror = () => {
+    clearTimeout(timer);
+    if (request === audioRequest) status.textContent = 'Audio could not play. Try opening the game in your regular browser.';
   };
   speech.speak(utterance);
+}
+
+async function speak(text) {
+  stopAudio();
+  const request = audioRequest;
+  const status = el('audioStatus');
+  status.textContent = 'Loading audio…';
+  try {
+    if (!AudioOutput) throw new Error('Web Audio unavailable');
+    audioContext ??= new AudioOutput();
+    const resumed = audioContext.resume();
+    let decoded = speechBuffers.get(text);
+    const engine = await Promise.all([loadVoiceEngine(), resumed]).then(([loaded]) => loaded);
+    if (request !== audioRequest) return;
+    if (!decoded) {
+      const wav = engine.speak(text, {rawdata: true, speed: 150, voice: 'en/en-us'});
+      decoded = await audioContext.decodeAudioData(wav);
+      speechBuffers.set(text, decoded);
+    }
+    if (request !== audioRequest) return;
+    const source = audioContext.createBufferSource();
+    source.buffer = decoded;
+    source.connect(audioContext.destination);
+    source.onended = () => {
+      source.disconnect();
+      if (audioSource === source) audioSource = null;
+    };
+    source.start();
+    audioSource = source;
+    status.textContent = '';
+  } catch {
+    if (request === audioRequest) playBrowserVoice(text, request);
+  }
 }
 
 el('next').addEventListener('click', () => {
