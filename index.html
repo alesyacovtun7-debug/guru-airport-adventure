@@ -1,225 +1,281 @@
-
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111e30">
 <title>GURU | Airport Adventure</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#0b1426;color:#fff;
-font-family:Arial,sans-serif;min-height:100vh;
-display:grid;place-items:center;padding:20px}
-.game{width:min(100%,560px);background:#14213b;
-border:1px solid #33435f;border-radius:24px;
-padding:26px;box-shadow:0 20px 60px #0005}
-header{display:flex;justify-content:space-between;
-align-items:center;color:#f4cc83;font-weight:bold}
-.progress{display:flex;gap:6px;margin:24px 0}
-.progress span{height:6px;flex:1;background:#35435d;
-border-radius:10px}
-.progress .active{background:#f4cc83}
-small{color:#f4cc83;letter-spacing:2px}
-h1{font-size:30px;margin:10px 0 22px}
-.scene{background:#203352;border-radius:18px;
-padding:26px;text-align:center;margin-bottom:20px}
-.emoji{font-size:58px;margin-bottom:14px}
-.question{font-size:20px;line-height:1.5}
-.choice{display:block;width:100%;padding:17px;
-margin:10px 0;text-align:left;background:#203352;
-color:white;border:1px solid #455674;
-border-radius:12px;cursor:pointer;font-size:16px}
-.choice:hover:not(:disabled){border-color:#f4cc83}
-.choice.correct{background:#17443c;
-border-color:#4bd5a8}
-.choice.wrong{background:#552d3a;
-border-color:#ff8995}
-.choice:disabled{cursor:default}
-.feedback{background:#263957;border-radius:12px;
-padding:16px;line-height:1.6;margin:18px 0}
-.next{width:100%;padding:17px;border:0;
-border-radius:12px;background:#f4cc83;
-color:#17233b;font-size:17px;font-weight:bold;
-cursor:pointer;margin-top:14px}
-.hidden{display:none}
-.result{text-align:center;padding:30px 0}
-.result .score{font-size:56px;color:#f4cc83}
-footer{text-align:center;color:#8e9db6;
-font-size:12px;margin-top:24px}
+body{margin:0;background:#111e30;color:#17263b;font-family:system-ui,sans-serif;padding:clamp(12px,4vw,48px)}
+main{max-width:720px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#ffdaa1;font-weight:750;margin-bottom:16px;font-size:.88rem}
+.card{background:#fff8e9;border-radius:22px;overflow:hidden}
+.content{padding:clamp(18px,5vw,38px)}
+.hero{position:relative;height:142px;background:linear-gradient(#213a59,#47617a);overflow:hidden;display:flex;align-items:center;justify-content:center;color:#ffdda2;isolation:isolate}
+.hero:before{content:"";position:absolute;bottom:16px;left:-10%;width:120%;height:45px;transform:rotate(-6deg);background:repeating-linear-gradient(90deg,#d4a778 0 25px,transparent 25px 65px) center/100% 3px no-repeat,#1a2a3f;z-index:-1}
+.plane{display:block;font-family:system-ui,sans-serif;font-size:96px;line-height:1;transform:rotate(-12deg);animation:arrive .65s ease-out}
+@keyframes arrive{from{translate:-65px 18px;opacity:.2}}
+h1,h2,p{margin-top:0} h1{font-size:clamp(1.8rem,7vw,3rem);line-height:1.04;margin-bottom:14px}
+h2{font-size:clamp(1.35rem,5vw,2rem);margin-bottom:12px}
+p{line-height:1.5}
+.choices,.levels,.controls{display:grid;gap:10px}
+.levels button{text-align:left}
+.levels strong{display:block;margin-bottom:3px}
+button{background:#fffdf8;color:#17263b;border:1px solid #b8aa94;border-radius:12px;padding:12px 15px;font:inherit;font-weight:650;cursor:pointer;min-height:46px}
+button:hover:not(:disabled){border-color:#17263b;background:#fff0d3}
+button:focus-visible,[tabindex="-1"]:focus-visible{outline:3px solid #1a659b;outline-offset:3px}
+.primary{background:#ffcc79;border-color:#8f621e}
+.choices button{text-align:left}
+.choices button.correct{background:#d6f1e4;border-color:#197750}
+.choices button.wrong{background:#fbe0dc;border-color:#9e4435}
+button:disabled{cursor:default;opacity:1;color:inherit}
+.meta{color:#525b62;font-size:.9rem;font-weight:700;margin-bottom:8px}
+.scene{background:#e8edf2;border-radius:14px;padding:16px;margin:14px 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.avatar{display:grid;place-items:center;border-radius:50%;width:52px;height:52px;background:#fff;font-size:29px}
+.scene p{margin:4px 0 0}
+.track{width:100%;accent-color:#936219;margin:0 0 16px}
+.feedback{padding:12px 14px;background:#e8edf2;border-radius:12px;margin:14px 0}
+.feedback p{margin:4px 0 0}
+.controls{margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}
+.summary{font-size:2rem;font-weight:800}
+textarea{width:100%;min-height:105px;font:inherit;padding:10px;border:1px solid #b8aa94;border-radius:10px}
+footer{text-align:center;color:#e0d3bc;margin-top:16px;font-size:.85rem}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){.plane{animation:none}}
 </style>
 </head>
 <body>
-<main class="game">
-<header>
-<div>✈ GURU ENGLISH GAMES</div>
-<div id="score">⭐ 0 XP</div>
-</header>
-<div id="progress" class="progress"></div>
-<section id="play">
-<small id="mission"></small>
-<h1 id="place"></h1>
-<div class="scene">
-<div id="emoji" class="emoji"></div>
-<div id="question" class="question"></div>
+<main>
+<header><span>GURU × CHICKEN OR FISH</span><span id="score" hidden></span></header>
+<div class="card">
+<section id="home" aria-labelledby="title">
+<div class="hero" aria-hidden="true"><span class="plane">✈︎</span></div>
+<div class="content">
+<h1 id="title" lang="en" tabindex="-1">Airport Adventure</h1>
+<p>От интервью до посадки. Практикуй английский в 20 миссиях или выбери свой уровень.</p>
+<div class="levels" id="levels"></div>
 </div>
-<div id="choices"></div>
-<div id="feedback" class="feedback hidden"
-aria-live="polite"></div>
-<button id="next" class="next hidden"
-onclick="nextMission()">Next mission →</button>
 </section>
-<section id="result" class="result hidden">
-<div style="font-size:64px">🏆</div>
-<h1>Mission Complete!</h1>
-<div id="finalScore" class="score"></div>
+<section id="play" class="content" aria-labelledby="place" hidden>
+<p class="meta" id="mission"></p>
+<progress id="progress" class="track" aria-label="Миссии пройдены"></progress>
+<h2 id="place" lang="en" tabindex="-1"></h2>
+<div class="scene"><span id="avatar" class="avatar" aria-hidden="true"></span><div>
+<strong id="character"></strong><p id="question" lang="en"></p>
+</div></div>
+<div class="controls"><button id="listen">🔊 Слушать задание</button></div>
+<p id="audioStatus" role="status"></p>
+<div id="choices" class="choices" lang="en"></div>
+<div id="feedback" class="feedback" hidden>
+<strong id="verdict"></strong><p id="correction" lang="en"></p><p id="tip"></p>
+</div>
+<div class="controls">
+<button id="next" class="primary" hidden></button>
+<button id="listenAnswer" hidden>🔊 Слушать ответ</button>
+<button id="back">К выбору уровня</button>
+</div>
+</section>
+<section id="result" class="content" aria-labelledby="resultTitle" hidden>
+<h2 id="resultTitle" tabindex="-1">Маршрут завершён</h2>
+<p id="finalScore" class="summary"></p>
 <p id="message"></p>
-<button class="next" onclick="restart()">
-Play again ↻
-</button>
+<div class="controls">
+<button id="again" class="primary">Пройти ещё раз</button>
+<button id="copy">Скопировать для тренера</button>
+<button id="menu">К выбору уровня</button>
+</div>
+<p id="shareStatus" role="status"></p>
+<textarea id="shareText" aria-label="Результат для тренера" readonly hidden></textarea>
 </section>
-<footer>GURU • Practice English. Fly higher.</footer>
+</div>
+<footer>GURU · Practice English. Fly higher.</footer>
 </main>
 <script>
-const missions=[
-{
-name:"01 / CREW INTRODUCTION",
-place:"Crew briefing room",emoji:"👩‍✈️",
-q:"The recruiter says: Please introduce yourself.",
-a:[
-"My name is Anna. I am from Russia.",
-"I name Anna. I from Russia.",
-"Me Anna from Russia."
-],
-correct:0,
-tip:"Use My name is... and I am from..."
-},
-{
-name:"02 / CHECK-IN",
-place:"Airport check-in desk",emoji:"🧳",
-q:"A passenger asks: Where is Gate 12?",
-a:[
-"It is a passport.",
-"I am gate twelve.",
-"Go straight and turn left."
-],
-correct:2,
-tip:"Go straight = идите прямо. Turn left = налево."
-},
-{
-name:"03 / BOARDING",
-place:"Aircraft entrance",emoji:"✈️",
-q:"A passenger comes on board. What do you say?",
-a:[
-"Goodbye!",
-"Welcome on board!",
-"Good night yesterday!"
-],
-correct:1,
-tip:"Welcome on board! = Добро пожаловать на борт!"
-},
-{
-name:"04 / CABIN SERVICE",
-place:"Passenger cabin",emoji:"💺",
-q:"A passenger says: I can't find my seat.",
-a:[
-"May I see your boarding pass?",
-"I want a coffee.",
-"I am a window."
-],
-correct:0,
-tip:"May I see...? is a polite request."
-},
-{
-name:"05 / DRINK SERVICE",
-place:"In-flight service",emoji:"🥤",
-q:"You want to offer water to a passenger.",
-a:[
-"You water now.",
-"Water is fly.",
-"Would you like some water?"
-],
-correct:2,
-tip:"Would you like...? is a polite offer."
-}
+const characters = [
+  ['👩🏽‍💼', 'София · рекрутер'],
+  ['🧑🏻‍💼', 'Алекс · агент аэропорта'],
+  ['👩🏼‍✈️', 'Майя · бортпроводница'],
+  ['🧑🏾‍✈️', 'Даниэль · бортпроводник']
 ];
+const missions = [["A1","0","Crew introduction","Please introduce yourself.","My name is Anna. I'm from Russia.","My name Anna. I from Russia.","I have Anna. I'm Russia.","My name is… и I'm from… — имя и страна."],["A1","1","Check-in","Where is Gate 12?","Go straight and turn left.","Turn left after Gate 12.","Your seat is 12A.","Go straight — идите прямо. Turn left — поверните налево."],["A1","2","Boarding","A passenger steps onto the plane. Greet them.","Good morning! Welcome on board.","Goodbye! Have a nice day.","Good night! See you tomorrow.","Welcome on board! — Добро пожаловать на борт!"],["A1","2","Find the seat","Excuse me, I can't find my seat.","May I see your boarding pass?","May I take your drink?","May I close the door?","May I see…? — Можно посмотреть…?"],["A1","3","Drink service","Offer a passenger some water.","Would you like some water?","Do you have any water?","Could I have some water?","Would you like…? — вежливое предложение."],["A1","3","Tea or coffee","Could I have some tea, please?","Of course. With milk or lemon?","Of course. Window or aisle?","Of course. What is your seat number?","With milk or lemon? — С молоком или лимоном?"],["A2","0","Interview","How do you help nervous passengers?","I listen first and explain what to expect.","I expect them to explain the flight to me.","I wait for them to stop asking questions.","What to expect — чего ожидать."],["A2","1","Bag drop","Can I take this suitcase on board? It’s over the cabin baggage limit.","I'm afraid it needs to be checked in.","You can keep it under your seat.","I'll tag it as cabin baggage.","Check in a bag — сдать багаж."],["A2","1","Gate change","Is my flight still leaving from Gate 12? It’s now at Gate 18.","The gate has changed to Gate 18.","Your seat has changed to 18A.","Boarding starts in eighteen minutes.","The gate has changed — выход на посадку изменился."],["A2","2","Seat location","My boarding pass says 14C. Is that by the window? 14C is on the aisle.","It's an aisle seat in row 14.","It's a window seat in row 14.","It's the middle seat in row 14.","Aisle seat — место у прохода. Row — ряд."],["A2","2","Hand luggage","Can I leave my bag here in the aisle?","Could you put it under the seat in front of you?","Could you leave it beside your feet in the aisle?","Could you put it right by the exit?","The seat in front of you — кресло перед вами."],["A2","3","Meal service","We’re out of chicken. Offer the other available meal.","I'm afraid we're out of chicken. Would you like fish instead?","The chicken is ready. Would you like to wait?","We’re out of fish. Would you like chicken instead?","We’re out of… — у нас закончилось… Instead — вместо этого."],["A2","3","Extra blanket","I'm feeling cold. Do you have a spare blanket?","Let me check if we have one available.","Let me check what time we land.","Let me see if your meal is ready.","A spare blanket — запасной плед."],["B1","0","Interview follow-up","Tell me about a time you handled a complaint.","A guest was upset about a delay, so I gave them an update and offered a place to wait.","I usually arrive early and make sure my uniform looks neat.","I would probably ask someone else to speak to the guest.","Для вопроса Tell me about a time… приведи конкретный пример из прошлого."],["B1","1","Tight connection","My flight is delayed. Can you guarantee I’ll make my connection?","I can't guarantee that, but I can check your connection and available options.","Yes, I'm sure the next flight will wait for you.","You'll have to book a new ticket before we check anything.","I can check your options — могу уточнить, какие у вас есть варианты."],["B1","1","Boarding announcement","Good afternoon. We are now boarding groups one and two. All other groups, please remain seated.","Only groups one and two should approach the gate now.","Groups one and two should remain seated.","All passengers can board now.","Remain seated — оставайтесь на своих местах."],["B1","2","Seat mix-up","Someone is in my seat, but they say their boarding pass has the same number.","Let me check both boarding passes so we can sort this out.","Ask them to move immediately. Your seat is definitely the correct one.","Please take any empty seat and stay there for the flight.","Sort this out — разобраться с ситуацией."],["B1","3","Food allergies","I have a nut allergy. Can you confirm this dessert is safe for me?","Let me check the ingredient information. I can't confirm until I've checked.","It looks fine. I don't see any nuts.","It should be safe if you only have a small bite.","I can't confirm until I've checked — смогу подтвердить после проверки."],["B1","3","Service complaint","I've been waiting for my drink for twenty minutes.","I understand that's frustrating. I'll check on your order now.","You'll just have to wait. Everyone else is waiting too.","You must have forgotten to order it.","I understand that's frustrating — понимаю, как это неприятно."],["B1","2","Arrival","The seat belt sign is still on. A passenger asks if they can get their bag.","Please remain seated until the sign is switched off.","You can get your bag now if you're quick.","You can stand up as soon as we touch down.","Until the sign is switched off — пока табло не погаснет."]].map(
+  ([level, character, title, prompt, correct, distractorOne, distractorTwo, tip]) =>
+    ({level, character: Number(character), title, prompt, correct, distractors: [distractorOne, distractorTwo], tip})
+);
+const modes = {
+  all: 'Весь маршрут',
+  A1: 'A1 · Первые фразы',
+  A2: 'A2 · Ситуации в аэропорту и на борту',
+  B1: 'B1 · Вопросы пассажиров и интервью'
+};
+const storageKey = 'guru-airport-results-v2';
+const pointsPerAnswer = 20;
+const el = id => document.getElementById(id);
+const speech = window.speechSynthesis;
+let lastResults = readResults();
+let mode, route, step, correctCount, answered, resultText;
 
-let step=0,points=0,answered=false;
-const el=id=>document.getElementById(id);
+function readResults() {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey)) || {};
+  } catch {
+    return {};
+  }
+}
 
-function render(){
-answered=false;
-const m=missions[step];
-el("mission").textContent=m.name;
-el("place").textContent=m.place;
-el("emoji").textContent=m.emoji;
-el("question").textContent=m.q;
-el("score").textContent="⭐ "+points+" XP";
-el("feedback").classList.add("hidden");
-el("next").classList.add("hidden");
-el("choices").innerHTML="";
-el("progress").innerHTML="";
+function show(screen) {
+  for (const id of ['home', 'play', 'result']) el(id).hidden = id !== screen;
+  el('score').hidden = screen === 'home';
+}
 
-missions.forEach((_,i)=>{
-const bar=document.createElement("span");
-if(i<=step)bar.className="active";
-el("progress").appendChild(bar);
+function renderHome(moveFocus = true) {
+  stopAudio();
+  show('home');
+  el('levels').replaceChildren();
+  for (const [id, label] of Object.entries(modes)) {
+    const number = id === 'all' ? missions.length : missions.filter(mission => mission.level === id).length;
+    const previous = lastResults[id];
+    const button = document.createElement('button');
+    const strong = document.createElement('strong');
+    strong.textContent = label;
+    const details = number + (number < 5 ? ' миссии' : ' миссий');
+    button.append(strong, details + (previous ? ' · Последний результат ' + previous.correct + '/' + previous.total : ''));
+    button.addEventListener('click', () => start(id));
+    el('levels').append(button);
+  }
+  if (moveFocus) el('title').focus();
+}
+
+function start(id) {
+  stopAudio();
+  mode = id;
+  route = id === 'all' ? missions : missions.filter(mission => mission.level === id);
+  step = 0;
+  correctCount = 0;
+  show('play');
+  renderMission();
+}
+
+function renderMission() {
+  answered = false;
+  const mission = route[step];
+  const [avatar, character] = characters[mission.character];
+  el('mission').textContent = mission.level + ' · Миссия ' + (step + 1) + ' из ' + route.length;
+  el('progress').max = route.length;
+  el('progress').value = step;
+  el('place').textContent = mission.title;
+  el('avatar').textContent = avatar;
+  el('character').textContent = character;
+  el('question').textContent = mission.prompt;
+  el('score').textContent = (correctCount * pointsPerAnswer) + ' XP';
+  el('audioStatus').textContent = '';
+  el('listen').hidden = !speech || !window.SpeechSynthesisUtterance;
+  el('feedback').hidden = el('next').hidden = el('listenAnswer').hidden = true;
+  el('choices').replaceChildren();
+  const answers = [...mission.distractors];
+  answers.splice(Math.floor(Math.random() * (answers.length + 1)), 0, mission.correct);
+  for (const answer of answers) {
+    const button = document.createElement('button');
+    button.textContent = answer;
+    button.addEventListener('click', () => select(button, mission));
+    el('choices').append(button);
+  }
+  el('place').focus();
+}
+
+function select(selected, mission) {
+  if (answered) return;
+  answered = true;
+  const correct = selected.textContent === mission.correct;
+  if (correct) correctCount++;
+  for (const button of el('choices').children) {
+    button.disabled = true;
+    if (button.textContent === mission.correct) button.classList.add('correct');
+    else if (button === selected) button.classList.add('wrong');
+  }
+  el('score').textContent = (correctCount * pointsPerAnswer) + ' XP';
+  el('progress').value = step + 1;
+  el('verdict').textContent = correct ? 'Верно! +' + pointsPerAnswer + ' XP' : 'Правильный ответ';
+  el('correction').textContent = mission.correct;
+  el('tip').textContent = mission.tip;
+  el('feedback').hidden = false;
+  el('next').textContent = step + 1 === route.length ? 'Посмотреть результат →' : 'Следующая миссия →';
+  el('next').hidden = false;
+  el('listenAnswer').hidden = el('listen').hidden;
+  el('feedback').tabIndex = -1;
+  el('feedback').focus();
+}
+
+function finish() {
+  const total = route.length;
+  const xp = correctCount * pointsPerAnswer;
+  lastResults[mode] = {correct: correctCount, total};
+  let saved = true;
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(lastResults));
+  } catch {
+    saved = false;
+  }
+  show('result');
+  el('finalScore').textContent = correctCount + ' / ' + total + ' · ' + xp + ' XP';
+  let badge = 'Первый полёт';
+  if (correctCount === total) badge = 'Готов к взлёту';
+  else if (correctCount / total >= 0.7) badge = 'Уверенный курс';
+  el('message').textContent = 'Значок «' + badge + '». ' +
+    (saved ? 'Результат сохранён в этом браузере.' : 'Результат можно скопировать и отправить тренеру.');
+  resultText = ['GURU × Chicken or Fish · Airport Adventure', modes[mode],
+    'Правильных ответов: ' + correctCount + ' из ' + total, 'XP: ' + xp, 'Значок: ' + badge].join('\n');
+  el('shareStatus').textContent = '';
+  el('shareText').hidden = true;
+  el('resultTitle').focus();
+}
+
+function stopAudio() {
+  if (speech) speech.cancel();
+}
+
+function speak(text) {
+  stopAudio();
+  el('audioStatus').textContent = '';
+  const utterance = new SpeechSynthesisUtterance(text);
+  const english = speech.getVoices().find(voice => voice.lang.toLowerCase().startsWith('en'));
+  utterance.lang = english ? english.lang : 'en-GB';
+  if (english) utterance.voice = english;
+  utterance.rate = 0.88;
+  utterance.onerror = event => {
+    if (event.error !== 'interrupted' && event.error !== 'canceled') {
+      el('audioStatus').textContent = 'Озвучка сейчас недоступна в этом браузере.';
+    }
+  };
+  speech.speak(utterance);
+}
+
+el('next').addEventListener('click', () => {
+  if (!answered) return;
+  stopAudio();
+  step++;
+  if (step === route.length) finish();
+  else renderMission();
 });
-
-m.a.forEach((answer,i)=>{
-const btn=document.createElement("button");
-btn.className="choice";
-btn.textContent=String.fromCharCode(65+i)+". "+answer;
-btn.onclick=()=>select(i);
-el("choices").appendChild(btn);
+el('listen').addEventListener('click', () => speak(route[step].prompt));
+el('listenAnswer').addEventListener('click', () => speak(route[step].correct));
+el('again').addEventListener('click', () => start(mode));
+el('back').addEventListener('click', () => renderHome());
+el('menu').addEventListener('click', () => renderHome());
+el('copy').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(resultText);
+    el('shareStatus').textContent = 'Скопировано. Вставь результат в сообщение тренеру.';
+  } catch {
+    const field = el('shareText');
+    field.value = resultText;
+    field.hidden = false;
+    field.focus();
+    field.select();
+    el('shareStatus').textContent = 'Скопируй выделенный текст и отправь тренеру.';
+  }
 });
-}
-
-function select(i){
-if(answered)return;
-answered=true;
-const m=missions[step];
-const correct=i===m.correct;
-if(correct)points+=20;
-el("score").textContent="⭐ "+points+" XP";
-
-[...el("choices").children].forEach((btn,j)=>{
-btn.disabled=true;
-if(j===m.correct)btn.classList.add("correct");
-else if(j===i)btn.classList.add("wrong");
-});
-
-el("feedback").textContent=
-(correct?"Excellent! +20 XP. ":"Not quite! +0 XP. ")
-+m.tip;
-el("feedback").classList.remove("hidden");
-el("next").textContent=
-step===missions.length-1?
-"See my results →":"Next mission →";
-el("next").classList.remove("hidden");
-}
-
-function nextMission(){
-step++;
-if(step<missions.length){render();return;}
-el("play").classList.add("hidden");
-el("progress").classList.add("hidden");
-el("result").classList.remove("hidden");
-el("finalScore").textContent=points+" / 100 XP";
-el("message").textContent=points===100?
-"Outstanding! You're ready for your next mission.":
-points>=60?
-"Great work! Keep practising your cabin crew English.":
-"Good start! Review the phrases and try again.";
-}
-
-function restart(){
-step=0;points=0;
-el("result").classList.add("hidden");
-el("play").classList.remove("hidden");
-el("progress").classList.remove("hidden");
-render();
-}
-render();
+renderHome(false);
 </script>
 </body>
 </html>
